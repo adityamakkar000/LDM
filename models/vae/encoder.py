@@ -45,9 +45,3 @@ class Encoder(nn.Module):
         x = mean + stdev * noise
         x *= 0.18125
         return x
-
-
-
-
-
-
