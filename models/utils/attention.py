@@ -8,8 +8,7 @@ import typing
 
 
 class SelfAttention(nn.Module):
-
-    def __init__(self, n_heads: int, d_embed:int, in_proj_bias=True, out_proj_bias=True)
+def __init__(self, n_heads: int, d_embed:int, in_proj_bias=True, out_proj_bias=True)
 
         super().__init__()
 
@@ -45,6 +44,41 @@ class SelfAttention(nn.Module):
 
         output = self.out_proj(output)
 
+        return output
+
+
+
+
+class CrossAttention(nn.Module):
+
+    def __init__(self, n_heads, d_embed, d_cross, in_proj_bias=True, out_proj_bias=True)
+
+        super().__init__()
+
+
+        self.k_proj = nn.Linear(d_cross, d_embed)
+        self.q_proj = nn.Linear(d_embed, d_embed )
+        self.v_proj = nn.Linear(d_cross, d_embed)
+        self.out_proj
+        self.n_heads = n_heads
+        self.d_head = d_embed // n_heads
+
+    def forward(self, x: Tensor, context: Tensor):
+
+        batch_size, seq_len, d_embed = x.shape
+        inter_shape = (batch_size, seq_len, self.n_heads, self.d_head)
+
+        k = self.k_proj(context).view(inter_shape).tranpose(1,2)
+        q = self.q_proj(x).view(inter_shape).tranpose(1,2)
+        v = self.v_proj(context).view(inter_shape).tranpose(1,2)
+
+        weight = q @ k.tranpose(-1,-2)
+        weight /= self.d_head.sqrt()
+
+        output = weight @ v
+        output.tranpose(1,2).view(batch_size, seq_len, d_embed)
+
+        output = self.out_proj(output)
         return output
 
 
